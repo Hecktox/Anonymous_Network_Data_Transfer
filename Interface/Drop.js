@@ -19,4 +19,13 @@ function sendMessage() {
     console.log('Message:', message);
 
     // Add your logic to send the message
+
+    // Show the snackbar
+    const snackbar = document.getElementById('snackbar');
+    snackbar.className = 'show';
+
+    // Hide the snackbar after 2 seconds (2000 milliseconds)
+    setTimeout(() => {
+        snackbar.className = snackbar.className.replace('show', '');
+    }, 2000);
 }

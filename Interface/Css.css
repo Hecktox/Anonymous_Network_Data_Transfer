@@ -111,3 +111,23 @@ th {
 .label{
     padding: 5px;
 }
+#snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: 0; /* Adjust the margin-left to position the snackbar on the left */
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 10px; /* Adjust the left property to position the snackbar on the left */
+    top: 5px; /* Adjust the top property to set the distance from the top */
+    transition: visibility 0.5s ease;
+}
+
+
+#snackbar.show {
+    visibility: visible;
+}

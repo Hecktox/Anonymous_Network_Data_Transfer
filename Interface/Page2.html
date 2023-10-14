@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page 2</title>
     <link rel="stylesheet" type="text/css" href="Css.css">
-    
+
+    <!-- Add styles for the snackbar -->
+   
 </head>
 <body>
     <h1 class="header">Bell Tor</h1>
 
     <div id="selectedIPBox">
-        <script src="IpSelect.js"></script>
+        <script src="IpSelect.js">
+            
+        </script>
     </div>
 
     <div id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
@@ -19,11 +23,16 @@
     </div>
 
     <div id="messageContainer">
-        <label for="messageInput" class = "label">Send Message:</label>
+        <label for="messageInput">Send Message:</label>
         <input type="text" id="messageInput" name="messageInput">
-        <button type="button" class="button1" onclick="sendMessage()">Send</button>
+        <button type= "button" class = "button2" onclick="sendMessage()">Send</button>
     </div>
 
-    <script src="Drop.js"></script>
+    <!-- Add the snackbar container -->
+    <div id="snackbar">Message sent!</div>
+
+    <script src="Drop.js">
+       
+    </script>
 </body>
 </html>
