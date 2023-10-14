@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page 2</title>
+    <link rel="stylesheet" type="text/css" href="Css.css">
+    
+</head>
+<body>
+    <h1 class="header">Bell Tor</h1>
+
+    <div id="selectedIPBox">
+        <script>
+            // Function to get the value of a query parameter by name
+            function getQueryParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            // Get the selected IP from the query parameter
+            const selectedIP = getQueryParam('selectedIP');
+
+            if (selectedIP) {
+                // Display the selected IP in a box
+                document.write('<p>Selected IP: ' + selectedIP + '</p>');
+            } else {
+                document.write('<p>No IP selected</p>');
+            }
+        </script>
+    </div>
+
+    <div id="dropArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+        <h5 class="h5">Drag files here to send</h5>
+    </div>
+
+    <div id="messageContainer">
+        <label for="messageInput" class = "label">Send Message:</label>
+        <input type="text" id="messageInput" name="messageInput">
+        <button type="button" class="button1" onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                // Handle dropped files here
+                console.log('Dropped files:', files);
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            console.log('Message:', message);
+
+            // Add your logic to send the message
+        }
+    </script>
+</body>
+</html>
