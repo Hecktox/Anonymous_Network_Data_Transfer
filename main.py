@@ -1,23 +1,17 @@
 # THIS IS SERVER ONLY
 
+from BellTorNetwork import SocketMan
 import socket
+import threading
 
 HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 PORT = 10000  # Port to listen on (non-privileged ports are > 1023)
 
-print("starting")
+print("Starting...")
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
+socketServer = SocketMan(HOST, PORT)
 
-    while True:
-        conn, addr = s.accept()
-        with conn:
-            print(f"Connected by {addr}")
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                print(data)
-                conn.sendall(b"AAAAAAAAAAAA FCK U")
+# socketServer.listen_for_msg()
+t1 = threading.Thread(target=socketServer.listen_and_forward).start()
+print("a")
+
