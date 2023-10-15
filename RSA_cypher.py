@@ -122,7 +122,9 @@ class RSA_cypher:
 if __name__ == "__main__":
 
     print("hey")
-    # keypair = generate_keypair(bits=16)
+    # nodeId = 6
+    # cypherClient = RSA_cypher(nodeId)
+    # keypair = cypherClient.generate_keypair(bits=16)
     # public_key, private_key = keypair
     #
     # print(type(public_key))
@@ -130,20 +132,20 @@ if __name__ == "__main__":
     # print(f"Public Key (n, e): {public_key}")
     # print(f"Private Key (n, d): {private_key}")
     #
-    # with open("keys\\node1pub.txt", "r+") as file:
+    # with open(f"keys\\node{nodeId}pub.txt", "w+") as file:
     #     file.write(f"{public_key}")
-    # with open("keys\\node1priv.txt", "r+") as file:
+    # with open(f"keys\\node{nodeId}priv.txt", "w+") as file:
     #     file.write(f"{private_key}")
-    #
-    # with open("keys\\node1pub.txt", "r") as file:
+
+    # with open(f"keys\\node{nodeId}pub.txt", "r") as file:
     #     pubSet = file.readline().replace("(", "").replace(")", "").strip().split(", ")
     #     public_key = (int(pubSet[0]), int(pubSet[1]))
-    # with open("keys\\node1priv.txt", "r") as file:
+    # with open(f"keys\\node{nodeId}priv.txt", "r") as file:
     #     privSet = file.readline().replace("(", "").replace(")", "").strip().split(", ")
     #     private_key = (int(privSet[0]), int(privSet[1]))
     #
     #     print(type(public_key))
-    #
+
     # print(f"Public Key (n, e): {public_key}")
     # print(f"Private Key (n, d): {private_key}")
 
