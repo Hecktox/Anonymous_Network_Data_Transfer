@@ -6,7 +6,7 @@ import json
 
 # HOST = "127.0.0.1"  # The server's hostname or IP address
 # HOST = "192.168.1.40"
-HOST = "172.20.24.32"
+HOST = "192.168.1.24"
 # HOST = socket.gethostbyname(socket.gethostname())
 PORT = 9999  # The port used by the server
 
@@ -37,15 +37,14 @@ with open("list_of_nodes.txt", 'r') as file:
     list_of_nodes.insert(0, f"{HOST}:{PORT}")
     list_of_nodes.append(f"{finaldestHOST}:{finaldestPORT}")
 
-global encrMsg
-encrMsg = ""
 msgToSend = "hello world! hows the weather?"
 
-def encrypt(list_ips):
+def encrypt(msg, list_ips):
     encryptedList = []
     list_ips.append(list_ips[-1])
     print(list_ips)
     # encrypt the ips in the list
+    encrMsg = ""
     for i in range(len(list_ips)):
         if i == 0 or list_ips[i - 1] == myAddress:
             address = list_ips[i - 1]
@@ -59,15 +58,16 @@ def encrypt(list_ips):
         if i == len(list_ips) - 1:
             print("sadkfjsdfkj")
             print(address)
-            global encrMsg
-            encrMsg = client.cypherClient.encrypt(msgToSend, pubKey)
+            encrMsg = client.cypherClient.encrypt(msg, pubKey)
         encryptedList.append(client.cypherClient.encrypt(list_ips[i], pubKey))
 
-    return encryptedList
+    encNetMsg = client.create_network_message(encrMsg, encryptedList)
+    return encNetMsg
 
-encryptedList = encrypt(list_of_nodes)
+# encryptedList = encrypt(list_of_nodes)
 print("encrypted:")
-print(encryptedList)
+encryptedNetworkMessage = encrypt(msgToSend, list_of_nodes)
+print(encryptedNetworkMessage)
 
 
 
@@ -75,7 +75,7 @@ print(encryptedList)
 
 # client.send_msg("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbb", destHOST, destPORT)
 # msg = client.create_network_message("hello world! hows the weather?", ["192.168.1.40:10001"])
-msg = client.create_network_message(encrMsg, encryptedList)
+msg = encryptedNetworkMessage
 client.send_msg(msg, nextHOST, nextPORT)
 # client.send_msg("whats_your_pub_key", destHOST, destPORT)
 
