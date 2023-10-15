@@ -46,8 +46,18 @@ class SocketMan:
                 with conn:
                     print(f"Connected by {addr}")
                     messageRecieved = b""
+
+                    is_ip_request = False
+
                     while True:
                         data = conn.recv(1024)
+                        # print(data.decode("utf-8"))
+                        if "whats_your_pub_key" in data.decode("utf-8"):
+                            is_ip_request = True
+                            print("AAAAAAAAAAAAAAA")
+                            conn.sendall(str(self.cypherClient.get_public_key()).encode("utf-8"))
+                            break
+
                         messageRecieved += data
 
                         if data.endswith(self.msg_ending.encode("utf-8")):
@@ -57,14 +67,11 @@ class SocketMan:
                             break
 
                     print("done: ")
-                    print(messageRecieved)
+                    # print(messageRecieved)
 
-                    # if "whats_you_ip" in data.decode("utf-8"):
-                    #     print("AAAAAAAAAAAAAAA")
-                    #     conn.sendall(self.cypherClient.get_public_key().encode("utf-8"))
-                    #     break
-
-                    self.get_next_ip(messageRecieved)
+                    if not is_ip_request:
+                        msg = messageRecieved[0:-len(self.msg_ending)]
+                        self.get_next_ip(msg)
 
     # def treat_msg(self, msg):
     #     if msg.decode("utf-8").startswith("whats_you_ip"):
@@ -79,12 +86,23 @@ class SocketMan:
         for ip in data["ips"]:
             print(ip)
 
+            # TODO: Check if you can decrypt the ip, if yes then proceed with it, else continue
+
+            newHost, newPort = ip.split(":")
+
+            self.send_msg(msg, newHost, int(newPort))
+
 
     def send_msg(self, msg, HOST, PORT):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
             # s.sendall(msg.encode("utf-8"))
-            s.sendall(json.dumps(msg).encode('utf-8'))
+            print("BRO LOOK HERE")
+            print(msg)
+            if type(msg) is bytes:
+                s.sendall(msg)
+            else:
+                s.sendall(json.dumps(msg).encode('utf-8'))
             s.sendall(self.msg_ending.encode("utf-8"))
             print(f"Received {s.recv(1024)!r}")
 
