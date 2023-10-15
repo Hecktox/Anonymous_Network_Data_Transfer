@@ -8,7 +8,7 @@ nodeId = 3
 
 # HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
 # HOST = "192.168.1.40"
-HOST = "192.168.38.214"
+HOST = "172.20.24.32"
 PORT = 10001  # Port to listen on (non-privileged ports are > 1023)
 
 print("Starting...")

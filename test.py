@@ -55,10 +55,13 @@ def encrypt(list_ips):
             pubKey = client.send_msg("whats_your_pub_key", str(address.split(":")[0]), int(address.split(":")[1])).decode("utf-8")
             # pubKey = client.ask_for_pub(str(address.split(":")[0]), int(address.split(":")[1]))
 
+        print("interesting")
         if i == len(list_ips) - 1:
-            # global encrMsg
+            print("sadkfjsdfkj")
+            print(address)
+            global encrMsg
             encrMsg = client.cypherClient.encrypt(msgToSend, pubKey)
-        encryptedList.append(client.cypherClient.encrypt(address, pubKey))
+        encryptedList.append(client.cypherClient.encrypt(list_ips[i], pubKey))
 
     return encryptedList
 

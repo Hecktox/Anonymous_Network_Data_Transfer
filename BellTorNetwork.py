@@ -1,6 +1,8 @@
 import socket
 import json
 import threading
+from typing import Optional
+
 from RSA_cypher import RSA_cypher
 
 
@@ -69,8 +71,11 @@ class SocketMan:
                         print(f"received msg: {messageRecieved}")
                         msg = messageRecieved[0:-len(self.msg_ending)]
                         newHost, newPort = self.get_next_ip(msg)
+                        print(newHost)
+                        print(newPort)
+                        print("REEEEEE")
                         if newHost is not None and newPort is not None:
-                            self.send_msg(newHost, newPort, msg)
+                            self.send_msg(HOST=newHost, PORT=newPort, msg=msg)
 
 
     # def treat_msg(self, msg):
@@ -79,7 +84,7 @@ class SocketMan:
     #     else:
     #         self.get_next_ip(msg)
 
-    def get_next_ip(self, msg):
+    def get_next_ip(self, msg: bytes) -> tuple:
         data = json.loads(msg.decode("utf-8"))
         print(data)
 
@@ -88,17 +93,18 @@ class SocketMan:
             try:
                 private_key = self.cypherClient.get_private_key()
                 decryptedIp = self.cypherClient.decrypt(ip, private_key)
-                print("found")
-                print(decryptedIp)
+                print(f"found {decryptedIp}")
                 if decryptedIp == f"{self.HOST}:{self.PORT}":
                     print(F"RECEIVED MESSAGE: {self.cypherClient.decrypt(data['msg'], private_key)}")
                     return None, None
                 else:
                     print("but i just return")
-                    return ip.split(":")
-            except:
+                    return decryptedIp.split(":")
+            except Exception as e:
+                print(f"THERES ERROR : {e}")
                 continue
         print("WTFFFFFF??????")
+        return None, None
 
 
     # def ask_for_pub(self, HOST, PORT):
@@ -114,7 +120,7 @@ class SocketMan:
     #         # print(f"Received {data!r}")
     #         return data
 
-    def send_msg(self, msg, HOST, PORT):
+    def send_msg(self, msg: Optional[str]=None, HOST='', PORT=''):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             # print(HOST)
             # print(PORT)
