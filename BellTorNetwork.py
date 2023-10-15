@@ -1,10 +1,16 @@
 import socket
+import json
+import threading
+from RSA_cypher import RSA_cypher
 
 
 class SocketMan:
-    def __init__(self, HOST=None, PORT=None):
+    def __init__(self, nodeId, HOST=None, PORT=None):
+        self.nodeId = nodeId
+        self.cypherClient = RSA_cypher(nodeId)
         self.HOST = HOST
         self.PORT = PORT
+        self.msg_ending = "|close"
 
     def listen_for_msg(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -44,7 +50,7 @@ class SocketMan:
                         data = conn.recv(1024)
                         messageRecieved += data
 
-                        if data.endswith(b"|close"):
+                        if data.endswith(self.msg_ending.encode("utf-8")):
                             print("raaaaaa")
                             # conn.sendall(b"yes i exist, im node 4")
                             conn.close()
@@ -53,16 +59,33 @@ class SocketMan:
                     print("done: ")
                     print(messageRecieved)
 
-    def get_next_ip(self):
-        pass
+                    # if "whats_you_ip" in data.decode("utf-8"):
+                    #     print("AAAAAAAAAAAAAAA")
+                    #     conn.sendall(self.cypherClient.get_public_key().encode("utf-8"))
+                    #     break
+
+                    self.get_next_ip(messageRecieved)
+
+    # def treat_msg(self, msg):
+    #     if msg.decode("utf-8").startswith("whats_you_ip"):
+    #         pass
+    #     else:
+    #         self.get_next_ip(msg)
+
+    def get_next_ip(self, msg):
+        data = json.loads(msg.decode("utf-8"))
+        print(data)
+
+        for ip in data["ips"]:
+            print(ip)
+
 
     def send_msg(self, msg, HOST, PORT):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
-            s.sendall(msg.encode("utf-8"))
-            # s.sendall(b"hjjh")
-            # s.sendall(b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbb")
-            s.sendall(b"|close")
+            # s.sendall(msg.encode("utf-8"))
+            s.sendall(json.dumps(msg).encode('utf-8'))
+            s.sendall(self.msg_ending.encode("utf-8"))
             print(f"Received {s.recv(1024)!r}")
 
     def create_network_message(self, msg, listIps):
@@ -77,3 +100,6 @@ class SocketMan:
         data['msg'] = msg
 
         return data
+
+    def run_server(self):
+        t1 = threading.Thread(target=self.listen_and_forward).start()
