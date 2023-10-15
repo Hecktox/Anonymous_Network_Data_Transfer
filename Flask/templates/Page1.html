@@ -15,33 +15,21 @@
         <table class="table1">
             <tr>
                 <th>IP</th>
+                <th>Add IP</th>
             </tr>
             <tr>
                 <td>
-                    111.11.111
-                    <input type="hidden" name="selectedIP" value="111.11.121">
-                    <button type="button" class="button1" onclick="connectClicked('111.11.121')">Connect</button>
+                    <input type="text" id="newIP" placeholder="Enter IP address">
                 </td>
-            </tr>
-            <tr>
                 <td>
-                    111.11.112
-                    <input type="hidden" name="selectedIP" value="111.11.112">
-                    <button type="button" class="button1" onclick="connectClicked('111.111.112')">Connect</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    111.11.113
-                    <input type="hidden" name="selectedIP" value="111.11.113">
-                    <button type="button" class="button1" onclick="connectClicked('111.131.113')">Connect</button>
+                    <button type="button" class="button1" onclick="addIP()">Add IP</button>
                 </td>
             </tr>
         </table>
     </form>
-
+    
     <table class="table2">
-        <h1 class="header2">Recive Data</h1>
+        <h1 class="header2">Receive Data</h1>
         <tr>
             <th>File</th>
             <th>Messege</th>
@@ -85,11 +73,33 @@
     </table>
 
     <script>
+        // Initialize an array to store added IPs
+        var addedIPs = [];
+
         function connectClicked(selectedIP) {
             // Redirect to Page2.html with the selected IP as a query parameter
             window.location.href = 'Page2.html?selectedIP=' + selectedIP;
         }
-        
+
+        function addIP() {
+            var newIP = document.getElementById('newIP').value;
+            if (newIP.trim() !== '') {
+                // Add the new IP to the array
+                addedIPs.push(newIP);
+
+                // Append the new IP under the "Add IP" column
+                var table = document.querySelector('.table1');
+                var newRow = table.insertRow(-1); // Insert at the end
+                var newCellIP = newRow.insertCell(0);
+                newCellIP.innerHTML = newIP;
+
+                var newCellButton = newRow.insertCell(1);
+                newCellButton.innerHTML = '<button type="button" class="button1" onclick="connectClicked(\'' + newIP + '\')">Connect</button>';
+
+                document.getElementById('newIP').value = '';
+            }
+        }
+
         // Add an event listener to the form to prevent its default submission behavior
         document.getElementById('connectForm').addEventListener('submit', function (event) {
             event.preventDefault();
