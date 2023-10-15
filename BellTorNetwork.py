@@ -71,7 +71,9 @@ class SocketMan:
 
                     if not is_ip_request:
                         msg = messageRecieved[0:-len(self.msg_ending)]
-                        self.get_next_ip(msg)
+                        newHost, newPort = self.get_next_ip(msg)
+                        self.send_msg(newHost, newPort, msg)
+
 
     # def treat_msg(self, msg):
     #     if msg.decode("utf-8").startswith("whats_you_ip"):
@@ -87,24 +89,25 @@ class SocketMan:
             print(ip)
 
             # TODO: Check if you can decrypt the ip, if yes then proceed with it, else continue
-
-            newHost, newPort = ip.split(":")
-
-            self.send_msg(msg, newHost, int(newPort))
+            # newHost, newPort = ip.split(":")
+            # self.send_msg(msg, newHost, int(newPort))
+            return ip.split(":")
 
 
     def send_msg(self, msg, HOST, PORT):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
             # s.sendall(msg.encode("utf-8"))
-            print("BRO LOOK HERE")
-            print(msg)
+            # print("BRO LOOK HERE")
+            # print(msg)
             if type(msg) is bytes:
                 s.sendall(msg)
             else:
                 s.sendall(json.dumps(msg).encode('utf-8'))
             s.sendall(self.msg_ending.encode("utf-8"))
-            print(f"Received {s.recv(1024)!r}")
+            data = s.recv(1024)
+            # print(f"Received {data!r}")
+            return data
 
     def create_network_message(self, msg, listIps):
         # format:
