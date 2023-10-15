@@ -53,26 +53,24 @@ class SocketMan:
                         data = conn.recv(1024)
                         # print(data.decode("utf-8"))
                         if "whats_your_pub_key" in data.decode("utf-8"):
+                            print("got ip req")
                             is_ip_request = True
-                            print("AAAAAAAAAAAAAAA")
                             conn.sendall(str(self.cypherClient.get_public_key()).encode("utf-8"))
                             break
 
                         messageRecieved += data
 
                         if data.endswith(self.msg_ending.encode("utf-8")):
-                            print("raaaaaa")
                             # conn.sendall(b"yes i exist, im node 4")
                             conn.close()
                             break
 
-                    print("done: ")
-                    # print(messageRecieved)
-
                     if not is_ip_request:
+                        print(f"received msg: {messageRecieved}")
                         msg = messageRecieved[0:-len(self.msg_ending)]
                         newHost, newPort = self.get_next_ip(msg)
-                        self.send_msg(newHost, newPort, msg)
+                        if newHost is not None and newPort is not None:
+                            self.send_msg(newHost, newPort, msg)
 
 
     # def treat_msg(self, msg):
@@ -86,17 +84,42 @@ class SocketMan:
         print(data)
 
         for ip in data["ips"]:
-            print(ip)
 
-            # TODO: Check if you can decrypt the ip, if yes then proceed with it, else continue
-            # newHost, newPort = ip.split(":")
-            # self.send_msg(msg, newHost, int(newPort))
-            return ip.split(":")
+            try:
+                private_key = self.cypherClient.get_private_key()
+                decryptedIp = self.cypherClient.decrypt(ip, private_key)
+                print("found")
+                print(decryptedIp)
+                if decryptedIp == f"{self.HOST}:{self.PORT}":
+                    print(F"RECEIVED MESSAGE: {self.cypherClient.decrypt(data['msg'], private_key)}")
+                    return None, None
+                else:
+                    print("but i just return")
+                    return ip.split(":")
+            except:
+                continue
+        print("WTFFFFFF??????")
 
+
+    # def ask_for_pub(self, HOST, PORT):
+    #     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    #         print(f"sending to: {HOST}:{PORT}")
+    #         s.connect((str(HOST), int(PORT)))
+    #         # s.sendall(msg.encode("utf-8"))
+    #         # print("BRO LOOK HERE")
+    #         # print(msg)
+    #         s.sendall("whats_your_pub_key".encode("utf-8"))
+    #         s.sendall(self.msg_ending.encode("utf-8"))
+    #         data = s.recv(1024)
+    #         # print(f"Received {data!r}")
+    #         return data
 
     def send_msg(self, msg, HOST, PORT):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
+            # print(HOST)
+            # print(PORT)
+            print(f"sending to: {HOST}:{PORT}")
+            s.connect((str(HOST), int(PORT)))
             # s.sendall(msg.encode("utf-8"))
             # print("BRO LOOK HERE")
             # print(msg)

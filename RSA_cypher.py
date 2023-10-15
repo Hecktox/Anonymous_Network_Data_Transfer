@@ -73,6 +73,10 @@ class RSA_cypher:
         return ((n, e), (n, d))
 
     def encrypt(self, message, public_key):
+        if type(public_key) is str:
+            pubSet = public_key.replace("(", "").replace(")", "").strip().split(", ")
+            public_key = (int(pubSet[0]), int(pubSet[1]))
+
         n, e = public_key
         encrypted_message = [pow(ord(char), e, n) for char in message]
         return encrypted_message
@@ -86,7 +90,7 @@ class RSA_cypher:
         keypair = self.generate_keypair(bits=16)
         public_key, private_key = keypair
 
-        print(type(public_key))
+        # print(type(public_key))
 
         print(f"Public Key (n, e): {public_key}")
         print(f"Private Key (n, d): {private_key}")
@@ -102,11 +106,15 @@ class RSA_cypher:
             public_key = (int(pubSet[0]), int(pubSet[1]))
             return public_key
 
-    def get_keys(self):
-        public_key = self.get_public_key()
+    def get_private_key(self):
         with open(f"keys\\node{self.nodeId}priv.txt", "r") as file:
             privSet = file.readline().replace("(", "").replace(")", "").strip().split(", ")
             private_key = (int(privSet[0]), int(privSet[1]))
+            return private_key
+
+    def get_keys(self):
+        public_key = self.get_public_key()
+        private_key = self.get_private_key()
 
         return public_key, private_key
 

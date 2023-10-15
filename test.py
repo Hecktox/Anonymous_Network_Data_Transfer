@@ -14,42 +14,66 @@ nodeId = 2
 
 client = SocketMan(nodeId, HOST, PORT)
 
+# client.send_msg("whats_your_pub_key", "192.168.38.214", 10001).decode("utf-8")
+# exit(0)
 # t1 = threading.Thread(target=client.listen_for_msg).start()
 
 
-destHOST = "172.20.24.32"
+finaldestHOST = "172.20.24.32"
 # destHOST = "192.168.1.40"
 # destPORT = 10000
-destPORT = 10001
+finaldestPORT = 10001
+
+final_dest_pub_key = None
 
 myAddress = f"{HOST}:{PORT}"
 
 with open("list_of_nodes.txt", 'r') as file:
     list_of_nodes = file.readline().strip().split(", ")
-    random.shuffle(list_of_nodes)
+    # random.shuffle(list_of_nodes)
+    nextHOST = str(list_of_nodes[0].split(":")[0])
+    nextPORT = int(list_of_nodes[0].split(":")[1])
 
     list_of_nodes.insert(0, f"{HOST}:{PORT}")
-    list_of_nodes.append(f"{destHOST}:{destPORT}")
+    list_of_nodes.append(f"{finaldestHOST}:{finaldestPORT}")
 
-print(list_of_nodes)
-# encrypt the ips in the list
-for i in range(len(list_of_nodes)):
-    if i == 0 or list_of_nodes[i - 1] == myAddress:
-        pubKey = client.cypherClient.get_public_key()
-        # print("my own")
-    else:
-        address = list_of_nodes[i - 1].split(":")
-        # print(f"address: {address}")
-        pubKey = client.send_msg("whats_your_pub_key", address[0], int(address[1])).decode("utf-8")
-    print(f"PUB HERE : {pubKey}")
+global encrMsg
+encrMsg = ""
+msgToSend = "hello world! hows the weather?"
 
-# print(pubKey)
+def encrypt(list_ips):
+    encryptedList = []
+    list_ips.append(list_ips[-1])
+    print(list_ips)
+    # encrypt the ips in the list
+    for i in range(len(list_ips)):
+        if i == 0 or list_ips[i - 1] == myAddress:
+            address = list_ips[i - 1]
+            pubKey = client.cypherClient.get_public_key()
+        else:
+            address = list_ips[i - 1]
+            pubKey = client.send_msg("whats_your_pub_key", str(address.split(":")[0]), int(address.split(":")[1])).decode("utf-8")
+            # pubKey = client.ask_for_pub(str(address.split(":")[0]), int(address.split(":")[1]))
 
-exit(0)
+        if i == len(list_ips) - 1:
+            # global encrMsg
+            encrMsg = client.cypherClient.encrypt(msgToSend, pubKey)
+        encryptedList.append(client.cypherClient.encrypt(address, pubKey))
+
+    return encryptedList
+
+encryptedList = encrypt(list_of_nodes)
+print("encrypted:")
+print(encryptedList)
+
+
+
+# exit(0)
 
 # client.send_msg("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbb", destHOST, destPORT)
-msg = client.create_network_message("hello world! hows the weather?", ["192.168.1.40:10001"])
-client.send_msg(msg, destHOST, destPORT)
+# msg = client.create_network_message("hello world! hows the weather?", ["192.168.1.40:10001"])
+msg = client.create_network_message(encrMsg, encryptedList)
+client.send_msg(msg, nextHOST, nextPORT)
 # client.send_msg("whats_your_pub_key", destHOST, destPORT)
 
 
