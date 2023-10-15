@@ -1,5 +1,6 @@
 import random
 
+#Checks if a given number is prime or not.
 def is_prime(n):
     if n <= 1:
         return False
@@ -14,6 +15,7 @@ def is_prime(n):
         i += 6
     return True
 
+#Generates large number and then checks if it is prime
 def generate_large_prime(bits):
     while True:
         candidate = random.getrandbits(bits)
@@ -21,11 +23,15 @@ def generate_large_prime(bits):
         if is_prime(candidate):
             return candidate
 
+#Calculates greatest common divisor
 def gcd(a, b):
     while b:
         a, b = b, a % b
     return a
 
+#This function calculates the multiplicative inverse of 'e' modulo 'phi'.
+# It checks if 'e' and 'phi' are coprime (their GCD is 1) and then uses
+# the extended Euclidean algorithm to find the modular multiplicative inverse of 'e' modulo 'phi'.
 def multiplicative_inverse(e, phi):
     if gcd(e, phi) != 1:
         return None
@@ -45,6 +51,7 @@ def multiplicative_inverse(e, phi):
 
     return u1 % phi
 
+#Encrypts msg using the RSA algorithm.Takes each character as ASCII and encrypts 
 def rsa_encrypt(plaintext, public_key, modulus):
     encrypted = [pow(ord(char), public_key, modulus) for char in plaintext]
     return encrypted
