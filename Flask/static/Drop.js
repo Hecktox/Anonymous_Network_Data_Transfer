@@ -14,9 +14,31 @@ function handleDrop(event) {
 }
 
 function sendMessage() {
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+    
+    // Get the selected IP from the query parameter
+    const selectedIP = getQueryParam('selectedIP');
+
+    
     const messageInput = document.getElementById('messageInput');
     const message = messageInput.value;
+    
+    console.log('Selected IP:', selectedIP);
     console.log('Message:', message);
+
+    fetch('/send-message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            ip: selectedIP,
+            message: message
+        })
+    });
 
     // Add your logic to send the message
 

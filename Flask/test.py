@@ -6,7 +6,7 @@ import json
 
 # HOST = "127.0.0.1"  # The server's hostname or IP address
 # HOST = "192.168.1.40"
-HOST = "192.168.1.24"
+HOST = "192.168.56.1"
 # HOST = socket.gethostbyname(socket.gethostname())
 PORT = 9999  # The port used by the server
 
@@ -19,7 +19,7 @@ client = SocketMan(nodeId, HOST, PORT)
 # t1 = threading.Thread(target=client.listen_for_msg).start()
 
 
-finaldestHOST = "172.20.24.32"
+finaldestHOST = "192.168.56.1"
 # destHOST = "192.168.1.40"
 # destPORT = 10000
 finaldestPORT = 10001

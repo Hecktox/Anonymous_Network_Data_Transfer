@@ -37,6 +37,7 @@ class SocketMan:
 
     def listen_and_forward(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind((self.HOST, self.PORT))
             s.listen()
 

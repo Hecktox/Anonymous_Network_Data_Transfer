@@ -3,7 +3,7 @@ from BellTorNetwork import SocketMan
 
 app = Flask(__name__, template_folder='templates')
 
-HOST = "172.20.24.32"
+HOST = "192.168.56.1"
 # HOST = socket.gethostbyname(socket.gethostname())
 PORT = 9999  # The port used by the server
 
@@ -19,9 +19,15 @@ added_ips = []
 def index():
     return render_template('Page1.html', added_ips=added_ips)
 
-@app.route('/Page2')
+@app.route('/Page2', methods = ['GET', 'POST'])
 def about():
+    # if request.method == 'POST':
+    #     user = request.form['nm']
+    #     print(user)
+    #     return index
+    # else:
     return render_template('Page2.html')
+
 
 @app.route('/add_ip', methods=['POST'])
 def add_ip():
@@ -31,12 +37,21 @@ def add_ip():
         # update_node_file()
     return index()
 
-@app.route('/send_message', methods=['POST'])
+@app.route('/send-message', methods = ['GET','POST'])
 def send_message():
-    new_ip = request.form.get('messageInput')
-    if new_ip and new_ip.strip():
-        added_ips.append(new_ip)
-    return index()
+    # msg = request.args.get('messageInput')
+    # msg = request.form["messageInput"]
+    # new_ip = request.args.get('addressInput')
+    address = request.form['addressInput']
+    msg = request.form['messageInput']
+
+    print(msg)
+    print(address)
+
+    handle_send_msg(msg, address)
+
+    # return about()
+    return ('', 204)
 
 def update_node_file():
     try:
@@ -47,17 +62,19 @@ def update_node_file():
         print("Error writing to file: {}".format(str(e)))
 
 
-def handle_send_msg(msgToSend, finaldestHOST, finaldestPORT):
+def handle_send_msg(msgToSend, finaldestAddress):
+    final_dest_pub_key = None
+
     myAddress = f"{HOST}:{PORT}"
 
-    with open("../list_of_nodes.txt", 'r') as file:
+    with open("list_of_nodes.txt", 'r') as file:
         list_of_nodes = file.readline().strip().split(", ")
         # random.shuffle(list_of_nodes)
         nextHOST = str(list_of_nodes[0].split(":")[0])
         nextPORT = int(list_of_nodes[0].split(":")[1])
 
         list_of_nodes.insert(0, f"{HOST}:{PORT}")
-        list_of_nodes.append(f"{finaldestHOST}:{finaldestPORT}")
+        list_of_nodes.append(f"{finaldestAddress}")
 
     # msgToSend = "hello world! hows the weather?"
 
